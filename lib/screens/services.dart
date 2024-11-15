@@ -585,4 +585,53 @@ class _ServicesState extends State<Services> {
         )
     );
   }
+
+  /*
+  DropdownButton<String>(
+                      hint: Text('Sélectionner une option'), // Texte de l'indication
+                      value: _selectedValue, // La valeur sélectionnée actuelle
+                      icon: Icon(Icons.arrow_drop_down), // Icône du menu déroulant
+                      items: _options.map((String option) {
+                        return DropdownMenuItem<String>(
+                          value: option,
+                          child: Text(option),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedValue = newValue; // Mise à jour de la valeur sélectionnée
+                        });
+                      },
+                    )
+
+      Container(
+                    width: 236,
+                    height: 30,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 1,
+                          color: Colors.black.withOpacity(0.10000000149011612),
+                        ),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                    ),
+                    child : TextField(
+                      decoration: InputDecoration(
+                        hintText: 'mon.indentification@mail.com',
+                        border: InputBorder.none, // Pas de bordure par défaut
+                        contentPadding: EdgeInsets.symmetric(vertical: 11, horizontal: 0),
+                      ),
+                      style : TextStyle(
+                        color: Colors.black.withOpacity(0.8500000238418579),
+                        fontSize: 13,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        height: 0,
+                      ),
+                    )
+                  ),
+   */
 }
