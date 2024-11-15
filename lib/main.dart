@@ -1,5 +1,7 @@
 import 'package:abp/screens/agenda.dart';
 import 'package:abp/screens/home.dart';
+import 'package:abp/screens/institut.dart';
+import 'package:abp/screens/services.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -40,17 +42,17 @@ class _MyHomePageState extends State<MyHomePage> {
   // Listes des widgets correspondant à chaque onglet
   final List<Widget> _pages = [
     Agenda(),
-    Center(child: Text('Page 2')),
+    Services(),
     Home(),
-    Center(child: Text('Page 4')),
+    Institut(),
     Center(child: Text('Page 5')),
   ];
 
   final List<String> app_bar_titre = [
     "Agenda",
-    "Services",
+    "Services & Prestations",
     "Aujourd'hui",
-    "Institut",
+    "AB Beauty Salon",
     "Paramètres"
   ];
 
