@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../components/clients.dart';
 import '../components/photo_institut.dart';
 
 class Institut extends StatefulWidget {
@@ -29,6 +30,7 @@ class _InstitutState extends State<Institut> {
                 ),
               ),
             ),
+            SizedBox(height : 10),
             Photo_Institut(),
             const TabBar(
               tabs: [
@@ -42,13 +44,13 @@ class _InstitutState extends State<Institut> {
               unselectedLabelColor: Colors.grey, // Couleur des onglets non sélectionnés
             ),
 
-            const Expanded(
+            Expanded(
               child: TabBarView(
                 children: [
-                  Center(),
-                  Center(),
-                  Center(),
-                  Center(),
+                  Clients(),
+                  const Center(),
+                  const Center(),
+                  const Center(),
                 ],
               ),
             ),

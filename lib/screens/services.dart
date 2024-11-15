@@ -11,6 +11,9 @@ class Services extends StatefulWidget {
 }
 
 class _ServicesState extends State<Services> {
+  String categorie = "Tout le monde";
+  List<String> categories = ["Femme", "Homme", "Fille", "Garçon", "Tout le monde"];
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -171,17 +174,18 @@ class _ServicesState extends State<Services> {
                   height: 23,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage("assets/images/team.png"),
+                      image: AssetImage("assets/images/Delete.png"),
                       fit: BoxFit.contain,
                     ),
                   ),
                 ),
+                SizedBox(width : 5),
                 Container(
                   width: 21,
                   height: 23,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage("assets/images/team.png"),
+                      image: AssetImage("assets/images/mage_edit.png"),
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -190,6 +194,7 @@ class _ServicesState extends State<Services> {
             )
           ]
         ),
+        SizedBox(height : 10),
         Text.rich(
           TextSpan(
               children : [
@@ -219,6 +224,7 @@ class _ServicesState extends State<Services> {
           ),
         ),
         //separateur(390),
+        SizedBox(height : 10),
         Row(
             mainAxisAlignment : MainAxisAlignment.spaceBetween,
           children : [
@@ -243,10 +249,11 @@ class _ServicesState extends State<Services> {
           ]
         ),
         //separateur(390),
+        SizedBox(height : 10),
         InkWell(
           onTap : (){
             showBottomSheet(context: context, builder: (BuildContext context) {
-              return _bottomSheet(false);
+              return _nvle_prestation(); //_bottomSheet(false);
             });
           },
           child: Row(
@@ -276,6 +283,7 @@ class _ServicesState extends State<Services> {
               ]
           ),
         ),
+        SizedBox(height : 10),
         Row(
             mainAxisAlignment : MainAxisAlignment.spaceBetween,
           children : [
@@ -324,8 +332,8 @@ class _ServicesState extends State<Services> {
         ),
       child: Padding(
         padding: const EdgeInsets.only(left : 15, top : 10, right : 10, bottom : 10),
-        child: Column(
-            crossAxisAlignment : CrossAxisAlignment.start,
+        child: ListView(
+            //crossAxisAlignment : CrossAxisAlignment.start,
           children : [
             Text(
               'Nouvelle prestation',
@@ -348,8 +356,22 @@ class _ServicesState extends State<Services> {
               ),
             ),
             SizedBox(height : 10),
+            _input_container(TextField(
+              decoration: InputDecoration(
+                hintText: 'Option 10',
+                border: InputBorder.none, // Pas de bordure par défaut
+                contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
+              ),
+              style : TextStyle(
+                color: Colors.black.withOpacity(0.8500000238418579),
+                fontSize: 13,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w500,
+              ),
+            ), 345, 40, "Nom prestation "),
+            SizedBox(height : 20),
             Text(
-              'Nom prestation ',
+              'Catégories ',
               style: TextStyle(
                 color: Color(0xFF1E1E1E),
                 fontSize: 14,
@@ -358,26 +380,345 @@ class _ServicesState extends State<Services> {
               ),
             ),
             SizedBox(height : 5),
-            Container(
-              width: 345,
-              height: 38,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              clipBehavior: Clip.antiAlias,
-              decoration: ShapeDecoration(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 1,
-                    strokeAlign: BorderSide.strokeAlignCenter,
-                    color: Color(0xFFD9D9D9),
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            DropdownButton<String>(
+              hint: Text('Sélectionner une option'), // Texte de l'indication
+              value: categorie, // La valeur sélectionnée actuelle
+              icon: Icon(Icons.arrow_drop_down), // Icône du menu déroulant
+              items: categories.map((String option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  categorie = newValue!; // Mise à jour de la valeur sélectionnée
+                });
+                print(categorie);
+              },
+            ),
+            SizedBox(height : 10),
+            _input_container(TextField(
+              decoration: InputDecoration(
+                hintText: 'Prix',
+                border: InputBorder.none, // Pas de bordure par défaut
+                contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
               ),
+              style : TextStyle(
+                color: Colors.black.withOpacity(0.8500000238418579),
+                fontSize: 13,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w500,
+              ),
+            ), 345, 40, "Prix - en Euro"),
+            SizedBox(height : 20),
+            _input_container(TextField(
+              decoration: InputDecoration(
+                hintText: '15 min - 20 min',
+                border: InputBorder.none, // Pas de bordure par défaut
+                contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
+              ),
+              style : TextStyle(
+                color: Colors.black.withOpacity(0.8500000238418579),
+                fontSize: 13,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w500,
+              ),
+            ), 345, 40, "Durée en minutes"),
+            SizedBox(height : 20),
+            _input_container(TextField(
+              minLines : 3,
+              maxLines : 5,
+              decoration: InputDecoration(
+                hintText: '',
+                border: InputBorder.none, // Pas de bordure par défaut
+                contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
+              ),
+              style : TextStyle(
+                color: Colors.black.withOpacity(0.8500000238418579),
+                fontSize: 13,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w500,
+              ),
+            ), 345, 130, "Description "),
+            SizedBox(height : 20),
+            Row(
+              mainAxisAlignment : MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 297,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Service à domicile\n',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'En couchant la case, vous acceptez que la pression peut être effectuer à la domicile du client.',
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.5),
+                            fontSize: 13,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Switch(
+                  value: true,
+                  onChanged: (_value){},
+                  activeTrackColor: Color(0xFF1E5F99),  // Couleur de la piste quand actif
+                  activeColor: Colors.white,            // Couleur du cercle quand actif
+                ),
+              ],
+            ),
+            SizedBox(height : 20),
+            Row(
+              mainAxisAlignment : MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 297,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Options & Extras (0)\n',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Ajoutez les options et les services extras afin compléter l’offre client.',
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.5),
+                            fontSize: 13,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 25,
+                  height: 26,
+                  padding: const EdgeInsets.symmetric(horizontal: 5.21, vertical: 5.42),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child : Icon(Icons.add)
+                )
+              ],
+            ),
+            SizedBox(height : 20),
+            Row(
+                mainAxisAlignment : MainAxisAlignment.end,
+                children : [
+                  InkWell(
+                    onTap : (){
+                      print("Retour");
+                    },
+                    child: Text(
+                      'Retour',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF1E5F99),
+                        fontSize: 14,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.10,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width : 20),
+                  InkWell(
+                    onTap : (){
+                      print("Valider");
+                    },
+                    child: Text(
+                      'Valider',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF1E5F99),
+                        fontSize: 14,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.10,
+                      ),
+                    ),
+                  ),
+                ]
             )
           ]
         ),
       )
+    );
+  }
+
+  Widget _update_prestation(){
+    return Container(
+        width : double.infinity,
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              width: 1,
+              color: Colors.black.withOpacity(0.10000000149011612),
+            ),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left : 15, top : 10, right : 10, bottom : 10),
+          child: ListView(
+            //crossAxisAlignment : CrossAxisAlignment.start,
+              children : [
+                Text(
+                  'Option',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height : 10),
+                Text(
+                  'Ajoutez les options à votre catalogue afin d’élargir le choix de vos clients.',
+                  style: TextStyle(
+                    color: Color(0xFF49454F),
+                    fontSize: 13,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.25,
+                  ),
+                ),
+                SizedBox(height : 10),
+                _input_container(TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Option 10',
+                    border: InputBorder.none, // Pas de bordure par défaut
+                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
+                  ),
+                  style : TextStyle(
+                    color: Colors.black.withOpacity(0.8500000238418579),
+                    fontSize: 13,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ), 345, 40, "Nom option "),
+                SizedBox(height : 20),
+                Text(
+                  'Catégories ',
+                  style: TextStyle(
+                    color: Color(0xFF1E1E1E),
+                    fontSize: 14,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                SizedBox(height : 5),
+                DropdownButton<String>(
+                  hint: Text('Sélectionner une option'), // Texte de l'indication
+                  value: categorie, // La valeur sélectionnée actuelle
+                  icon: Icon(Icons.arrow_drop_down), // Icône du menu déroulant
+                  items: categories.map((String option) {
+                    return DropdownMenuItem<String>(
+                      value: option,
+                      child: Text(option),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      categorie = newValue!; // Mise à jour de la valeur sélectionnée
+                    });
+                    print(categorie);
+                  },
+                ),
+                SizedBox(height : 10),
+                _input_container(TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Prix',
+                    border: InputBorder.none, // Pas de bordure par défaut
+                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
+                  ),
+                  style : TextStyle(
+                    color: Colors.black.withOpacity(0.8500000238418579),
+                    fontSize: 13,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ), 345, 40, "Prix - €"),
+                SizedBox(height : 20),
+                _input_container(TextField(
+                  decoration: InputDecoration(
+                    hintText: '15 min - 20 min',
+                    border: InputBorder.none, // Pas de bordure par défaut
+                    contentPadding: EdgeInsets.symmetric(vertical: 13, horizontal: 0),
+                  ),
+                  style : TextStyle(
+                    color: Colors.black.withOpacity(0.8500000238418579),
+                    fontSize: 13,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ), 345, 40, "Durée en minutes"),
+                SizedBox(height : 20),
+                Row(
+                    mainAxisAlignment : MainAxisAlignment.end,
+                    children : [
+                      InkWell(
+                        onTap : (){
+                          print("Retour");
+                        },
+                        child: Text(
+                          'Retour',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF1E5F99),
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.10,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width : 20),
+                      InkWell(
+                        onTap : (){
+                          print("Valider");
+                        },
+                        child: Text(
+                          'Valider',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF1E5F99),
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.10,
+                          ),
+                        ),
+                      ),
+                    ]
+                )
+              ]
+          ),
+        )
     );
   }
 
@@ -583,6 +924,42 @@ class _ServicesState extends State<Services> {
               ]
           ),
         )
+    );
+  }
+
+  Widget _input_container(Widget child, double width, double height, String label){
+    return Column(
+      crossAxisAlignment : CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Color(0xFF1E1E1E),
+            fontSize: 14,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        SizedBox(height : 5),
+        Container(
+            width: width,
+            height: height,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            clipBehavior: Clip.antiAlias,
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  width: 1,
+                  strokeAlign: BorderSide.strokeAlignCenter,
+                  color: Color(0xFFD9D9D9),
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child : child
+        ),
+      ],
     );
   }
 
