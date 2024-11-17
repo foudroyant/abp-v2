@@ -1,6 +1,7 @@
 import 'package:abp/screens/agenda.dart';
 import 'package:abp/screens/home.dart';
 import 'package:abp/screens/institut.dart';
+import 'package:abp/screens/parametres.dart';
 import 'package:abp/screens/services.dart';
 import 'package:flutter/material.dart';
 
@@ -45,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Services(),
     Home(),
     Institut(),
-    Center(child: Text('Page 5')),
+    Parametres()
   ];
 
   final List<String> app_bar_titre = [
