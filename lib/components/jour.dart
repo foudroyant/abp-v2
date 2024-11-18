@@ -1,5 +1,8 @@
 import 'package:abp/components/ui_element.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../utils/fn_dates.dart';
 
 class Jour extends StatefulWidget {
   const Jour({Key? key}) : super(key: key);
@@ -9,8 +12,13 @@ class Jour extends StatefulWidget {
 }
 
 class _JourState extends State<Jour> {
+  DateTime today = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
+    List<DateTime> jours = getDatesOfCurrentWeek(today);
+    print(jours);
+
     return ListView(
       children : [
         //CHIFFRE D'AFFAIRE

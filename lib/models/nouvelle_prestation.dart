@@ -16,12 +16,12 @@ class Nouvelle_Prestation with ChangeNotifier {
   bool get a_domicile => _a_domicile;
 
   void update_nom(String nom) {
-    _description = nom;
+    _nom = nom;
     notifyListeners(); // Notifie les widgets qui écoutent ce modèle
   }
 
   void update_description(String description) {
-    _nom = description;
+    _description = description;
     notifyListeners(); // Notifie les widgets qui écoutent ce modèle
   }
 
