@@ -70,17 +70,69 @@ class Option {
 
 enum EtatDisponible { disponible, indisponible, hc, reserved, cancel }
 
-class Creneau {
-  DateTime la_date;
-  String le_membre;
-  EtatDisponible etat;
-
-  Creneau({
-    required this.la_date,
-    required this.le_membre,
-    required this.etat,
-  });
+enum Etat {
+  DISPONIBLE,
+  INDISPONIBLE,
+  ANNULE,
+  HC,
+  RESERVE
 }
+
+class Creneau {
+  // Propriétés privées
+  DateTime _date;
+  Etat _etat;
+  DateTime _creneau;
+
+  // Constructeur
+  Creneau({
+    required DateTime date,
+    required Etat etat,
+    required DateTime creneau,
+  })  : _date = date,
+        _etat = etat,
+        _creneau = creneau;
+
+  // Méthodes pour récupérer les valeurs
+  DateTime get date => _date;
+  Etat get etat => _etat;
+  DateTime get creneau => _creneau;
+
+  // Méthodes pour modifier les valeurs
+  set date(DateTime newDate) {
+    _date = newDate;
+  }
+
+  set etat(Etat newEtat) {
+    _etat = newEtat;
+  }
+
+  set creneau(DateTime newCreneau) {
+    _creneau = newCreneau;
+  }
+
+  // Méthode pour afficher les informations du créneau
+  @override
+  String toString() {
+    return 'Creneau(date: $_date, etat: $_etat, creneau: $_creneau)';
+  }
+}
+
+List<Creneau> genererCreneaux(DateTime date, int nombreDeCreneaux) {
+  List<Creneau> creneaux = [];
+
+  for (int i = 0; i < nombreDeCreneaux; i++) {
+    DateTime heureDebut = date.add(Duration(minutes: i * 30)); // Création du créneau avec un intervalle de 30 minutes
+    creneaux.add(Creneau(
+      date: date,
+      etat: Etat.DISPONIBLE, // Par défaut, tous les créneaux sont DISPONIBLES
+      creneau: heureDebut,
+    ));
+  }
+
+  return creneaux;
+}
+
 
 class InstitutModel {
   late String nom;

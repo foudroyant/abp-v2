@@ -1,7 +1,10 @@
 import 'package:abp/components/ui_element.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import '../models/utils.dart';
+import '../utils/data.dart';
 import '../utils/fn_dates.dart';
 
 class Jour extends StatefulWidget {
@@ -17,7 +20,7 @@ class _JourState extends State<Jour> {
   @override
   Widget build(BuildContext context) {
     List<DateTime> jours = getDatesOfCurrentWeek(today);
-    print(jours);
+    List<Creneau> creneaux = genererCreneaux(context.read<Utils>().dateActuelle, 20);
 
     return ListView(
       children : [
@@ -28,7 +31,7 @@ class _JourState extends State<Jour> {
         container_du_mois(),
 
         //LES DATES
-        container_des_dates(),
+        ContainerDates(),//container_des_dates(),
 
         //INFOS
         la_legende(),
@@ -39,8 +42,8 @@ class _JourState extends State<Jour> {
 
         Center(
           child: Wrap(
-            children : [0,1,2,3,4,5,6,7,8,9].map((item){
-              return bouton_agenda(Color(0xFF9B9B9B), context);
+            children : creneaux.map((item){
+              return BoutonAgenda(creneau: item, context: context,);
             }).toList()
           ),
         ),

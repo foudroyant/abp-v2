@@ -1,5 +1,9 @@
 import 'package:abp/components/ui_element.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../models/utils.dart';
+import '../utils/data.dart';
 
 class Semaine extends StatefulWidget {
   const Semaine({Key? key}) : super(key: key);
@@ -11,8 +15,11 @@ class Semaine extends StatefulWidget {
 class _SemaineState extends State<Semaine> {
   List _data = [true, true, true, true];
 
+
   @override
   Widget build(BuildContext context) {
+    List<Creneau> creneaux = genererCreneaux(context.read<Utils>().dateActuelle, 10);
+
     return ListView(
       children : [
         //CHIFFRE D'AFFAIRE
@@ -22,7 +29,7 @@ class _SemaineState extends State<Semaine> {
         container_du_mois(),
 
         //LES DATES
-        container_des_dates(),
+        ContainerDates(),
 
         //INFOS
         la_legende(),
@@ -74,8 +81,8 @@ class _SemaineState extends State<Semaine> {
                     },
                     body: Center(
                       child: Wrap(
-                          children : [0,1,2,3,4,5,6,7,8,9].map((item){
-                            return bouton_agenda(Color(0xFF9B9B9B), context);
+                          children : creneaux.map((item){
+                            return BoutonAgenda(creneau : item, context : context);
                           }).toList()
                       ),
                     ),
