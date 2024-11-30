@@ -118,47 +118,143 @@ class Creneau {
   }
 }
 
-List<Creneau> genererCreneaux(DateTime date, int nombreDeCreneaux) {
+List<Creneau> genererCreneaux(DateTime heureDebut, DateTime heureFin) {
   List<Creneau> creneaux = [];
 
-  for (int i = 0; i < nombreDeCreneaux; i++) {
-    DateTime heureDebut = date.add(Duration(minutes: i * 30)); // Création du créneau avec un intervalle de 30 minutes
+  DateTime prochainCreneau = heureDebut;
+  while (prochainCreneau.isBefore(heureFin)) {
     creneaux.add(Creneau(
-      date: date,
+      date: prochainCreneau,
       etat: Etat.DISPONIBLE, // Par défaut, tous les créneaux sont DISPONIBLES
-      creneau: heureDebut,
+      creneau: prochainCreneau,
     ));
+
+    // Ajouter un intervalle de 30 minutes pour le prochain créneau
+    prochainCreneau = prochainCreneau.add(Duration(minutes: 30));
   }
 
   return creneaux;
 }
 
 
+
 class InstitutModel {
-  late String nom;
-  late String id;
-  late Map horaires;
-  late bool est_admin;
+  // Propriétés
+  String nom;
+  String telephone;
+  String siteWeb;
+  Map<String, Map<String, dynamic>> horaires; // Horaires incluant description et ouverture
+  List<String> images; // Liens vers les images de l'institut
+  String presentation;
+  Map<String, String> liens; // Liens des logos des réseaux sociaux
 
+  // Constructeur
   InstitutModel({
-    required this.id,
-  required this.nom,
-  required this.horaires,
-  required this.est_admin
-});
+    required this.nom,
+    required this.telephone,
+    required this.siteWeb,
+    required this.horaires,
+    required this.images,
+    required this.presentation,
+    required this.liens,
+  });
 
-  Map get getHoraires => horaires;
-  String get getId => id;
-  String get getNom => nom;
-  bool get getAdmin => est_admin;
-
-  void setNom(String nom){this.nom = nom;}
-  void setAdmin(bool etat){
-    this.est_admin = etat;
+  // Méthode pour afficher les détails sous forme de chaîne (exemple)
+  @override
+  String toString() {
+    return '''
+Institut:
+  Nom: $nom
+  Téléphone: $telephone
+  Site Web: $siteWeb
+  Horaires: $horaires
+  Images: $images
+  Présentation: $presentation
+  Liens Réseaux Sociaux: $liens
+''';
   }
 }
 
+InstitutModel institut = InstitutModel(
+  nom: "Institut Bien-Être",
+  telephone: "+33 1 23 45 67 89",
+  siteWeb: "https://institut-bienetre.com",
+  horaires: {
+    "Lundi": {
+      "description": "Horaires pour le lundi",
+      "Ouverture": [
+        DateTime(2024, 12, 4, 9, 0), // Heure d'ouverture
+        DateTime(2024, 12, 4, 18, 0) // Heure de fermeture
+      ],
+    },
+    "Mardi": {
+      "description": "Horaires pour le mardi",
+      "Ouverture": [
+        DateTime(2024, 12, 5, 10, 0),
+        DateTime(2024, 12, 5, 17, 0)
+      ],
+    },
+    "Mercredi": {
+      "description": "Horaires pour le mercredi",
+      "Ouverture": [
+        DateTime(2024, 12, 6, 9, 30),
+        DateTime(2024, 12, 6, 16, 30)
+      ],
+    },
+    "Jeudi": {
+      "description": "Horaires pour le jeudi",
+      "Ouverture": [
+        DateTime(2024, 12, 7, 8, 30),
+        DateTime(2024, 12, 7, 15, 0)
+      ],
+    },
+    "Vendredi": {
+      "description": "Horaires pour le vendredi",
+      "Ouverture": [
+        DateTime(2024, 12, 8, 9, 0),
+        DateTime(2024, 12, 8, 18, 0)
+      ],
+    },
+    "Samedi": {
+      "description": "Horaires pour le samedi",
+      "Ouverture": [
+        DateTime(2024, 12, 9, 10, 0),
+        DateTime(2024, 12, 9, 14, 0)
+      ],
+    },
+    "Dimanche": {
+      "description": "Horaires pour le dimanche (fermé)",
+      "Ouverture": [
+        DateTime(2024, 12, 10, 0, 0), // Pas d'ouverture
+        DateTime(2024, 12, 10, 0, 0) // Pas de fermeture
+      ],
+    },
+  },
+  images: [
+    "https://example.com/image1.jpg",
+    "https://example.com/image2.jpg"
+  ],
+  presentation: "Nous offrons des soins de qualité avec des produits naturels.",
+  liens: {
+    "G": "https://example.com/logo-google.png",
+    "I": "https://example.com/logo-instagram.png",
+    "F": "https://example.com/logo-facebook.png",
+    "X": "https://example.com/logo-x.png",
+    "T": "https://example.com/logo-tiktok.png",
+  },
+);
+
+
 List<String> categories = ["Femme", "Homme", "Fille", "Garçon", "Tout le monde"];
+List<String> joursSemaine = [
+  "Lundi",    // 1er jour de la semaine
+  "Mardi",    // 2ème jour de la semaine
+  "Mercredi", // 3ème jour de la semaine
+  "Jeudi",    // 4ème jour de la semaine
+  "Vendredi", // 5ème jour de la semaine
+  "Samedi",   // 6ème jour de la semaine
+  "Dimanche", // 7ème jour de la semaine
+];
 
 // Création des objets issus de la classe Prestation
 List<Prestation> prestations = [

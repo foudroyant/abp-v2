@@ -18,9 +18,18 @@ class _JourState extends State<Jour> {
   DateTime today = DateTime.now();
 
   @override
+  void initState() {
+    super.initState();
+    // Appeler la fonction du provider ici pour initialiser l'état
+    context.read<Utils>().genererCreneaux();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<DateTime> jours = getDatesOfCurrentWeek(today);
-    List<Creneau> creneaux = genererCreneaux(context.read<Utils>().dateActuelle, 20);
+
+    /*final creneauxProvider = Provider.of<Utils>(context, listen: false);
+    creneauxProvider.genererCreneaux();*/
 
     return ListView(
       children : [
@@ -42,9 +51,9 @@ class _JourState extends State<Jour> {
 
         Center(
           child: Wrap(
-            children : creneaux.map((item){
-              return BoutonAgenda(creneau: item, context: context,);
-            }).toList()
+            children: context.watch<Utils>().creneaux.map((item) {
+              return BoutonAgenda(creneau: item, context: context);
+            }).toList(),
           ),
         ),
 

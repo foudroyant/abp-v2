@@ -2,6 +2,7 @@ import 'package:abp/components/ui_element.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/institut_modele.dart';
 import '../models/utils.dart';
 import '../utils/data.dart';
 
@@ -18,7 +19,15 @@ class _SemaineState extends State<Semaine> {
 
   @override
   Widget build(BuildContext context) {
-    List<Creneau> creneaux = genererCreneaux(context.read<Utils>().dateActuelle, 10);
+    DateTime _ouverture = DateTime(
+      context.read<Utils>().dateActuelle.year,
+      context.read<Utils>().dateActuelle.month,
+      context.read<Utils>().dateActuelle.day,
+      institut.horaires[joursSemaine[context.read<Utils>().indexDateActuelle]]?["Ouverture"][0],
+      institut.horaires[joursSemaine[context.read<Utils>().indexDateActuelle]]?["Ouverture"][1],
+    );
+
+    List<Creneau> creneaux = genererCreneaux(context.read<Utils>().dateActuelle, context.read<Utils>().dateActuelle);
 
     return ListView(
       children : [

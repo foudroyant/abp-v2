@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/institut_modele.dart';
 import '../models/utils.dart';
 import '../utils/data.dart';
 import '../utils/lib_fn.dart';
@@ -424,7 +425,7 @@ class _ContainerDatesState extends State<ContainerDates> {
   @override
   Widget build(BuildContext context) {
 
-    final DateTime inputDate = DateTime(2024, 11, 29); // Vendredi 29 Novembre 2024
+    final DateTime inputDate = DateTime.now(); // Aujourd'hui
     final List<DateTime> weekDates = getWeekDates(inputDate);
 
     return Container(
@@ -440,10 +441,16 @@ class _ContainerDatesState extends State<ContainerDates> {
           return InkWell(
             onTap: () {
               context.read<Utils>().updateDate(value);
+              context.read<Utils>().updateIndexDate(index);
+              context.read<Utils>().updateIndexDateActuelle(index);
+
+              context.read<Utils>().genererCreneaux();
+              print('${institut.horaires[joursSemaine[context.read<Utils>().indexDateActuelle]]?["Ouverture"][0]} ---- ${institut.horaires[joursSemaine[context.read<Utils>().indexDateActuelle]]?["Ouverture"][1]}');
+              print(context.read<Utils>().creneaux);
               setState(() {
                 _focusedIndex = index; // Mettre à jour l'index actif
               });
-              print('Index cliqué : $index ------ Index actif : $_focusedIndex');
+
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
