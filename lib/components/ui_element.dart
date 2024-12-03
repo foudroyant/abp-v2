@@ -122,21 +122,22 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
   @override
   void initState() {
     super.initState();
-    creneau = widget.creneau;  // Initialisation de creneau à partir du widget
+    //creneau = widget.creneau;  // Initialisation de creneau à partir du widget
   }
 
   @override
   Widget build(BuildContext context) {
+    //print(widget.creneau);
     return Padding(
       padding: const EdgeInsets.only(left: 0, top: 10, right: 5, bottom: 0),
       child: Container(
         width: 80,
         height: 30,
         decoration: ShapeDecoration(
-          color: getColorForEtat(creneau.etat),
+          color: getColorForEtat(widget.creneau.etat),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(7),
-            side: creneau.etat == Etat.HC
+            side: widget.creneau.etat == Etat.HC
                 ? BorderSide(width: 1, color: Color(0xFF1ABC43))
                 : BorderSide.none,
           ),
@@ -145,10 +146,10 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
           children: [
             Center(
               child: Text(
-                '${creneau.creneau.hour}:${creneau.creneau.minute.toString().padLeft(2, '0')}',
+                '${widget.creneau.creneau.hour}:${widget.creneau.creneau.minute.toString().padLeft(2, '0')}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: creneau.etat == Etat.HC
+                  color: widget.creneau.etat == Etat.HC
                       ? Color(0xF71ABC43)
                       : Colors.white,
                   fontSize: 10,
@@ -184,7 +185,7 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                             Container(
                               width: double.infinity,
                               height: 35,
-                              child: const Stack(
+                              child:  Stack(
                                 children: [
                                   Center(
                                     child: Text(
@@ -203,7 +204,9 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                                   Positioned(
                                     right: 10,
                                     child: InkWell(
-                                        onTap: null,
+                                        onTap: (){
+                                          Navigator.pop(context);
+                                        },
                                         child: Icon(Icons.close)),
                                   ),
                                 ],
@@ -226,12 +229,12 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                               description:
                               'Les créneaux disponibles sont visibles au public et peuvent être réservés par un client.',
                               couleur: Color(0xFF21BF49),
-                              isSwitched: creneau.etat == Etat.DISPONIBLE,
+                              isSwitched: widget.creneau.etat == Etat.DISPONIBLE,
                               onSwitchChanged: (bool value) {
                                 setState(() {
-                                  creneau.etat = value
+                                  widget.creneau.etat = value
                                       ? Etat.DISPONIBLE
-                                      : creneau.etat;
+                                      : widget.creneau.etat;
                                 });
                               },
                             ),
@@ -240,10 +243,10 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                               description:
                               'Les créneaux des heures creuses sont visibles aux utilisateurs et peuvent être réservés par un client.',
                               couleur: Color(0xFF48925B),
-                              isSwitched: creneau.etat == Etat.HC,
+                              isSwitched: widget.creneau.etat == Etat.HC,
                               onSwitchChanged: (bool value) {
                                 setState(() {
-                                  creneau.etat = value ? Etat.HC : creneau.etat;
+                                  widget.creneau.etat = value ? Etat.HC : widget.creneau.etat;
                                 });
                               },
                             ),
@@ -252,11 +255,11 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                               description:
                               'Prendre un rendez-vous pour un nouveau client ou un client existant.',
                               couleur: Color(0xFFCC9812),
-                              isSwitched: creneau.etat == Etat.RESERVE,
+                              isSwitched: widget.creneau.etat == Etat.RESERVE,
                               onSwitchChanged: (bool value) {
                                 setState(() {
-                                  creneau.etat =
-                                  value ? Etat.RESERVE : creneau.etat;
+                                  widget.creneau.etat =
+                                  value ? Etat.RESERVE : widget.creneau.etat;
                                 });
                               },
                             ),
@@ -265,11 +268,11 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                               description:
                               'Les créneaux des heures indisponibles ne sont pas visible aux utilisateurs et ne peuvent pas être réserver.',
                               couleur: Color(0xFF9B9B9B),
-                              isSwitched: creneau.etat == Etat.INDISPONIBLE,
+                              isSwitched: widget.creneau.etat == Etat.INDISPONIBLE,
                               onSwitchChanged: (bool value) {
                                 setState(() {
-                                  creneau.etat =
-                                  value ? Etat.INDISPONIBLE : creneau.etat;
+                                  widget.creneau.etat =
+                                  value ? Etat.INDISPONIBLE : widget.creneau.etat;
                                 });
                               },
                             ),
@@ -278,11 +281,11 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                               description:
                               'Les créneaux des rendez-vous annulés sont visible aux utilisateurs et peuvent être réserver.',
                               couleur: Color(0xFFFC4004),
-                              isSwitched: creneau.etat == Etat.ANNULE,
+                              isSwitched: widget.creneau.etat == Etat.ANNULE,
                               onSwitchChanged: (bool value) {
                                 setState(() {
-                                  creneau.etat =
-                                  value ? Etat.ANNULE : creneau.etat;
+                                  widget.creneau.etat =
+                                  value ? Etat.ANNULE : widget.creneau.etat;
                                 });
                               },
                             ),
@@ -291,11 +294,11 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                               description:
                               'Autoriser le choix unique. C’est après le clique que la couleur de switch change.',
                               couleur: Color(0xFF1E1E1E),
-                              isSwitched: creneau.etat == Etat.DISPONIBLE,
+                              isSwitched: widget.creneau.etat == Etat.DISPONIBLE,
                               onSwitchChanged: (bool value) {
                                 setState(() {
-                                  creneau.etat =
-                                  value ? Etat.DISPONIBLE : creneau.etat;
+                                  widget.creneau.etat =
+                                  value ? Etat.DISPONIBLE : widget.creneau.etat;
                                 });
                               },
                             ),
@@ -307,7 +310,7 @@ class _BoutonAgendaState extends State<BoutonAgenda> {
                 },
                 child: Icon(
                   Icons.more_vert,
-                  color: creneau.etat == Etat.HC
+                  color: widget.creneau.etat == Etat.HC
                       ? Color(0xF71ABC43)
                       : Colors.white,
                   size: 20,
@@ -465,7 +468,8 @@ class _ContainerDatesState extends State<ContainerDates> {
 }
 
 
-Widget container_du_mois(){
+Widget container_du_mois(DateTime date_actuelle){
+
   return Container(
       width : double.infinity,
       padding: const EdgeInsets.only(left : 0, top :0, right : 0 , bottom : 10),
@@ -473,7 +477,7 @@ Widget container_du_mois(){
           children : [
             Center(
               child: Text(
-                'Novembre 2024',
+                obtenirMoisEtAnnee(date_actuelle),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,
@@ -503,6 +507,20 @@ Widget container_du_mois(){
           ]
       )
   );
+}
+
+String obtenirMoisEtAnnee(DateTime date) {
+  // Liste des mois en français
+  List<String> moisFrancais = [
+    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+  ];
+
+  // Obtenir le mois et l'année
+  String mois = moisFrancais[date.month - 1]; // Indices de 0 à 11
+  int annee = date.year;
+
+  return '$mois $annee';
 }
 
 Widget separateur(double width){

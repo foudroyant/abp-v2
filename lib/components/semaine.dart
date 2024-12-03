@@ -14,20 +14,75 @@ class Semaine extends StatefulWidget {
 }
 
 class _SemaineState extends State<Semaine> {
-  List _data = [true, true, true, true];
+  List etat_des_jours = [true, true, true, true, true, true, true];
+
+  // Variable d'état pour gérer l'index actif : Aujourd'hui
+  int _focusedIndex = DateTime.now().weekday - 1;
+
+  // Liste des jours de la semaine
+  final List<String> daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+  DateTime dateActuelle = DateTime.now();
+  late DateTime _ouverture;
+  late DateTime _fermeture;
 
 
   @override
-  Widget build(BuildContext context) {
-    DateTime _ouverture = DateTime(
-      context.read<Utils>().dateActuelle.year,
-      context.read<Utils>().dateActuelle.month,
-      context.read<Utils>().dateActuelle.day,
-      institut.horaires[joursSemaine[context.read<Utils>().indexDateActuelle]]?["Ouverture"][0],
-      institut.horaires[joursSemaine[context.read<Utils>().indexDateActuelle]]?["Ouverture"][1],
-    );
+  void initState (){
+    setState((){
+      _ouverture = DateTime(
+        dateActuelle.year,
+        dateActuelle.month,
+        dateActuelle.day,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][0].hour,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][0].minute,
+      );
 
-    List<Creneau> creneaux = genererCreneaux(context.read<Utils>().dateActuelle, context.read<Utils>().dateActuelle);
+      _fermeture = DateTime(
+        dateActuelle.year,
+        dateActuelle.month,
+        dateActuelle.day,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][1].hour,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][1].minute,
+      );
+    });
+  }
+
+  List<DateTime> getWeekDates(DateTime inputDate) {
+    // Trouver le début de la semaine (lundi)
+    final int weekday = inputDate.weekday; // 1 = Lundi, ..., 7 = Dimanche
+    final DateTime startOfWeek = inputDate.subtract(Duration(days: weekday - 1));
+
+    // Générer les 7 dates de la semaine
+    return List<DateTime>.generate(7, (index) => startOfWeek.add(Duration(days: index)));
+  }
+
+  void update_horaires(){
+
+    setState((){
+      _ouverture = DateTime(
+        dateActuelle.year,
+        dateActuelle.month,
+        dateActuelle.day,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][0].hour,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][0].minute,
+      );
+
+      _fermeture = DateTime(
+        dateActuelle.year,
+        dateActuelle.month,
+        dateActuelle.day,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][1].hour,
+        institut.horaires[joursSemaine[_focusedIndex]]?["Ouverture"][1].minute,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final DateTime inputDate = DateTime.now(); // Aujourd'hui
+    final List<DateTime> weekDates = getWeekDates(inputDate);
 
     return ListView(
       children : [
@@ -35,10 +90,37 @@ class _SemaineState extends State<Semaine> {
         CA("240"),
 
         //MOIS ET ANNEE
-        container_du_mois(),
+        container_du_mois(DateTime.now()),
 
         //LES DATES
-        ContainerDates(),
+        Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: weekDates
+                  .asMap()
+                  .entries
+                  .map((item) {
+                final index = item.key; // Index de l'élément
+                final value = item.value; // Valeur de l'élément
+
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        _focusedIndex = index; // Mettre à jour l'index actif
+                      });
+                      update_horaires();
+
+
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      child: lesdates(value.day.toString(), daysOfWeek[value.weekday - 1], _focusedIndex == index),
+                  ),
+                  );
+            })
+                .toList(),
+          ),
+        ),
 
         //INFOS
         la_legende(),
@@ -54,12 +136,36 @@ class _SemaineState extends State<Semaine> {
                     setState(() {
                       print(isExpanded);
                       setState(() {
-                        _data[index] = !isExpanded;
+                        etat_des_jours[index] = !etat_des_jours[index];
                       });
                     });
                   },
-                children : _data.map((item){
-                  //print(item);
+                children : weekDates
+                    .asMap()
+                    .entries.map((item){
+                  final index = item.key;
+                  final value = item.value;
+
+                  //print(value);
+
+                  DateTime ouverture = DateTime(
+                    value.year,
+                    value.month,
+                    value.day,
+                    institut.horaires[joursSemaine[index]]?["Ouverture"][0].hour,
+                    institut.horaires[joursSemaine[index]]?["Ouverture"][0].minute,
+                  );
+                  DateTime fermeture = DateTime(
+                    value.year,
+                    value.month,
+                    value.day,
+                    institut.horaires[joursSemaine[index]]?["Ouverture"][1].hour,
+                    institut.horaires[joursSemaine[index]]?["Ouverture"][1].minute,
+                  );
+
+                  //print( "${ouverture} ---- ${fermeture}");
+
+                  List<Creneau> creneaux = genererCreneaux(ouverture, fermeture);
                   return ExpansionPanel(
                     backgroundColor :  Colors.white,
                     headerBuilder: (BuildContext context, bool isExpanded) {
@@ -75,14 +181,14 @@ class _SemaineState extends State<Semaine> {
                         ),
                         child : Center(
                           child: Text(
-                            'Lundi 8 Avril 2024',
+                            formaterDate(item.value),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                               fontFamily: 'Roboto',
                               fontWeight: FontWeight.w500,
-                              height: 0,
+                              //height: 0,
                             ),
                           ),
                         ),
@@ -95,7 +201,7 @@ class _SemaineState extends State<Semaine> {
                           }).toList()
                       ),
                     ),
-                    isExpanded: item,
+                    isExpanded: etat_des_jours[index],
 
                   );
                 }).toList()

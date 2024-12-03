@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../components/ui_element.dart';
+import '../utils/data.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -8,6 +11,52 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  DateTime today = DateTime.now();
+  DateTime dateActuelle = DateTime.now();
+  // Variable d'état pour gérer l'index actif : Aujourd'hui
+  int _focusedIndex = DateTime.now().weekday - 1;
+
+  // Liste des jours de la semaine
+  final List<String> daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+
+// Création des réservations
+  late List<Reservation> reservations;
+  List<Creneau> creneaux = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    for (int i = 1; i <= 31; i++) {
+      for (int h = 8; h <= 17; h++) {
+        setState((){
+          creneaux.add(
+            Creneau(
+              date: DateTime(2024, 12, i),
+              etat: h%2==0 ? Etat.RESERVE : Etat.ANNULE,
+              creneau: DateTime(2024, 12, i, h, (h < 17 ? 0 : 30)), // Heure et minute
+            ),
+          );
+        });
+      }
+    }
+
+    setState((){
+      reservations = List.generate(5, (index) {
+        return Reservation(
+          creneau: creneaux[index],
+          etat: creneaux[index].etat,
+          nomClient: "Client ${index + 1}",
+          images: [], // Pas d'images dans cet exemple
+          acompte: 10.0 * (index + 1),
+          reste: [5.0 * (index + 1), 7.5 * (index + 1)],
+          prestations: autres_prestations,
+        );
+      });
+    });
+  }
 
   Widget _separateur(double width){
     return Container(
@@ -62,6 +111,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget _creneau_vide(String ladate){
+
     return Container(
         padding: const EdgeInsets.only(top: 5, left: 10, right: 5, bottom: 5),
       child : Row(
@@ -89,21 +139,22 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _rdv_cancel(){
+  Widget _rdv_cancel(Reservation reservation){
+    DateTime heure = reservation.creneau.creneau;
     return Container(
         padding: const EdgeInsets.only(top: 5, left: 10, right: 5, bottom: 5),
       child : Row(
           mainAxisAlignment : MainAxisAlignment.spaceBetween,
         children : [
           Text(
-            '15:00',
+            '${heure.hour}:${heure.minute}',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Color(0x993C3C43),
               fontSize: 12,
               fontFamily: 'SF Pro Display',
               fontWeight: FontWeight.w500,
-              height: 0,
+              //height: 0,
               letterSpacing: 0.30,
             ),
           ),
@@ -124,7 +175,7 @@ class _HomeState extends State<Home> {
                 child : Column(
                   children : [
                     Text(
-                      'AB User | Balayage + Coloration+ Manucure',
+                      '${reservation.nomClient} | Balayage + Coloration+ Manucure',
                       style: TextStyle(
                         color: Colors.black.withOpacity(0.5),
                         fontSize: 13,
@@ -162,7 +213,16 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget rdv_jaune(){
+  Widget rdv_jaune(Reservation reservation){
+    DateTime heure = reservation.creneau.creneau;
+    String _prestations = reservation.prestations.map((p){
+      return p.nom;
+    }).toList().join(" + ");
+
+    List<double> _prix = reservation.prestations.map((p){
+      return p.prix;
+    }).toList();
+
     return Container(
       width : double.infinity,
       height : 100,
@@ -172,7 +232,7 @@ class _HomeState extends State<Home> {
           Positioned(
             top : 10,
             child : Text(
-              '10:00',
+              "${heure.hour}:${heure.minute}",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Color(0x993C3C43),
@@ -187,7 +247,7 @@ class _HomeState extends State<Home> {
           Positioned(
             top : 60,
             child : Text(
-              '10:30',
+              '',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Color(0x993C3C43),
@@ -216,7 +276,7 @@ class _HomeState extends State<Home> {
               crossAxisAlignment : CrossAxisAlignment.start,
                 children : [
                   Text(
-                    'AB User | Balayage + Manucure',
+                    '${reservation.nomClient} | ${_prestations}',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 13,
@@ -309,6 +369,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final DateTime inputDate = DateTime.now(); // Aujourd'hui
+    final List<DateTime> weekDates = getWeekDates(inputDate);
+
     return Column(
       children : [
         Container(
@@ -357,23 +420,31 @@ class _HomeState extends State<Home> {
           ),
         ),
         Container(
-            padding: const EdgeInsets.only(top: 15, left: 0, right: 10, bottom: 0),
-          width : double.infinity,
-          height : 50,
-          child : Row(
-              mainAxisAlignment : MainAxisAlignment.spaceBetween,
-            children : [0,1,2,3,4,5,6].map((item){
-              return GestureDetector(
-                onTap : (){
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: weekDates
+                .asMap()
+                .entries
+                .map((item) {
+              final index = item.key; // Index de l'élément
+              final value = item.value; // Valeur de l'élément
+
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _focusedIndex = index; // Mettre à jour l'index actif
+                    dateActuelle = value;
+                  });
+
 
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 0, left: 0, right: 0, bottom: 0),
-                  child: _dates("02", "Lun", true),
+                  padding: const EdgeInsets.only(left: 5, right: 5),
+                  child: lesdates(value.day.toString(), daysOfWeek[value.weekday - 1], _focusedIndex == index),
                 ),
               );
-            }).toList()
-          )
+            }).toList(),
+          ),
         ),
         SizedBox(height : 10),
         Container(
@@ -382,11 +453,31 @@ class _HomeState extends State<Home> {
             decoration: BoxDecoration(color: Color(0xFFE5E5EA))
         ),
         Column(
-          children : [
-            _creneau_vide("08:00"),
+          //
+          /*
+          _creneau_vide("08:00"),
             _rdv_cancel(),
             rdv_jaune()
-          ]
+           */
+          children : reservations.map((reservation){
+            if(reservation.etat == Etat.ANNULE){
+              return InkWell(
+                onTap : (){
+                  print(reservation);
+                },
+                  child: _rdv_cancel(reservation)
+              );
+            }
+            else {
+              return InkWell(
+                  onTap : (){
+                    print(reservation);
+                  },
+                  child: rdv_jaune(reservation)
+              );
+            }
+
+          }).toList()
         )
       ]
     );

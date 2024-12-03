@@ -1,6 +1,9 @@
 import 'package:abp/components/ui_element.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/data.dart';
+import '../utils/lib_fn.dart';
+
 class Mois extends StatefulWidget {
   const Mois({Key? key}) : super(key: key);
 
@@ -9,6 +12,11 @@ class Mois extends StatefulWidget {
 }
 
 class _MoisState extends State<Mois> {
+
+  DateTime date = DateTime.now(); // 15 Décembre 2024
+  List<List<DateTime?>> semaines = recupererSemainesDuMois(DateTime.now());
+  List<int> taille_semaine = [];
+  List<int> num_semaine = [];
 
   Widget _btn_date(Color couleur){
     return Container(
@@ -56,13 +64,49 @@ class _MoisState extends State<Mois> {
     );
   }
 
-  Widget _table(String texte, bool is_opened, BuildContext context){
+  Widget _table(DateTime date, bool is_opened, BuildContext context, {String texte="Fermé"}){
     double _width = MediaQuery.of(context).size.width;
+
+    DateTime ouverture = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      institut.horaires[joursSemaine[date.weekday - 1]]?["Ouverture"][0].hour,
+      institut.horaires[joursSemaine[date.weekday - 1]]?["Ouverture"][0].minute,
+    );
+    DateTime fermeture = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      institut.horaires[joursSemaine[date.weekday - 1]]?["Ouverture"][1].hour,
+      institut.horaires[joursSemaine[date.weekday - 1]]?["Ouverture"][1].minute,
+    );
+
+    List<Creneau> creneaux = genererCreneaux(ouverture, fermeture);
+    if(!num_semaine.contains(recupererNumeroSemaine(date))){
+
+      setState((){
+        num_semaine.add(recupererNumeroSemaine(date));
+        taille_semaine.add(creneaux.length);
+      });
+    }
+    else{
+      int index = num_semaine.indexOf(recupererNumeroSemaine(date));
+      if(creneaux.length > taille_semaine[index]){
+        setState((){
+          taille_semaine[index] = creneaux.length;
+        });
+      }
+    };
+
+    int index = num_semaine.indexOf(recupererNumeroSemaine(date));
+    //print(creneaux);
+
     return Container(
-      height : (9*14)+24,
+      height : (taille_semaine[index]*14)+24,
       child: Column(
         mainAxisAlignment : MainAxisAlignment.start,
-        //crossAxisAlignment : CrossAxisAlignment.start,
+        crossAxisAlignment : CrossAxisAlignment.start,
         children: [
           Container(
             width: _width/8,
@@ -77,32 +121,24 @@ class _MoisState extends State<Mois> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  texte,
+                  texte == "Vide" ? "0" : date.day.toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 11,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
-                    height: 0,
+                    //height: 0,
                   ),
                 ),
               ],
             ),
           ),
           is_opened ? Column(
-            children : [
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-              _h_mois('9:00'),
-            ]
-          ) : Expanded(child: _closed("Fermé"))
+            children : creneaux.map((creneau){
+              return _h_mois(creneau);
+            }).toList()
+          ) : Expanded(child: _closed(texte))
         ],
       ),
     );
@@ -127,7 +163,7 @@ class _MoisState extends State<Mois> {
               fontSize: 8,
               fontFamily: 'Sora',
               fontWeight: FontWeight.w700,
-              height: 0,
+              //height: 0,
             ),
           ),
         ),
@@ -135,22 +171,29 @@ class _MoisState extends State<Mois> {
     );
   }
 
-  Widget _h_mois(String texte){
+  Widget _h_mois(Creneau creneau){
     return Padding(
       padding : EdgeInsets.only(left : 0, top : 0, right : 0, bottom : 2),
       child: Container(
         width : 35,
         height : 12,
         decoration: ShapeDecoration(
-          color: Color(0xF71ABC43),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+          color: getColorForEtat(creneau.etat),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(7),
+            side: creneau.etat == Etat.HC
+                ? BorderSide(width: 1, color: Color(0xFF1ABC43))
+                : BorderSide.none,
+          ),
         ),
         child : Center(
           child: Text(
-            texte,
+            '${creneau.creneau.hour}:${creneau.creneau.minute.toString().padLeft(2, '0')}',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white,
+              color: creneau.etat == Etat.HC
+                  ? Color(0xF71ABC43)
+                  : Colors.white,
               fontSize: 8,
               fontFamily: 'Sora',
               fontWeight: FontWeight.w700,
@@ -163,6 +206,8 @@ class _MoisState extends State<Mois> {
   }
   @override
   Widget build(BuildContext context) {
+
+    //print(semaines);
     return ListView(
       children : [
         //CHIFFRE D'AFFAIRE
@@ -175,10 +220,17 @@ class _MoisState extends State<Mois> {
             //crossAxisAlignment : CrossAxisAlignment.start,
         mainAxisAlignment : MainAxisAlignment.center,
           children : [
-            IconButton(onPressed: () {  }, icon: Icon(Icons.add),),
+            IconButton(onPressed: () {
+              if(date.month > 1){
+                setState((){
+                  date = DateTime(date.year, date.month - 1, date.day);
+                });
+              }
+              print(date.month);
+            }, icon: Icon(Icons.arrow_back),),
             SizedBox(width : 20),
             Text(
-              'Avril ',
+              moisFrancais[date.month - 1],
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
@@ -190,7 +242,14 @@ class _MoisState extends State<Mois> {
               ),
             ),
             SizedBox(width : 20),
-            IconButton(onPressed: () {  }, icon: Icon(Icons.add),),
+            IconButton(onPressed: () {
+              if(date.month < 12){
+                setState((){
+                  date = DateTime(date.year, date.month + 1, date.day);
+                });
+              }
+              print(date.month);
+            }, icon: Icon(Icons.arrow_forward),),
           ]
         ),
 
@@ -213,11 +272,21 @@ class _MoisState extends State<Mois> {
           color : Colors.grey
         ),
         Column(
-          children: [0,1,2,3].map((item){
+            crossAxisAlignment : CrossAxisAlignment.start,
+          children: semaines.map((semaine){
+            var numero_de_la_semaine;
+            for (DateTime? date in semaine) {
+              if (date != null) {
+                // Action à effectuer sur la première date non nulle
+                numero_de_la_semaine = recupererNumeroSemaine(date);
+                break; // Sortir de la boucle après avoir trouvé la première date non nulle
+              }
+            }
             return Column(
+              crossAxisAlignment : CrossAxisAlignment.start,
               children: [
                 Row(
-                  //mainAxisAlignment : MainAxisAlignment.start,
+                  mainAxisAlignment : MainAxisAlignment.start,
                     crossAxisAlignment : CrossAxisAlignment.start,
                     children : [
                       Padding(
@@ -231,7 +300,7 @@ class _MoisState extends State<Mois> {
                           ),
                           child : Center(
                             child: Text(
-                              '14',
+                              '${numero_de_la_semaine}',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
@@ -243,13 +312,18 @@ class _MoisState extends State<Mois> {
                           ),
                         ),
                       ),
-                      _table("1", true, context),
+                      Row(
+                        children : semaine.map((jour){
+                          return jour == null ? _table(DateTime.now(), false, context, texte : "Vide") : _table(jour, true, context);
+                        }).toList()
+                      )
+                      /*_table("1", true, context),
                       _table("2", true, context),
                       _table("3", true, context),
                       _table("4", true, context),
                       _table("5", true, context),
                       _table("6", true, context),
-                      _table("7", false, context),
+                      _table("7", false, context),*/
                     ]
                 ),
                 Container(

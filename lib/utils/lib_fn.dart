@@ -1,8 +1,9 @@
-// Fonction qui retourne une couleur selon l'état
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'data.dart';
 
+// Fonction qui retourne une couleur selon l'état
 Color getColorForEtat(Etat etat) {
   switch (etat) {
     case Etat.DISPONIBLE:
@@ -18,4 +19,16 @@ Color getColorForEtat(Etat etat) {
     default:
       return Color(0xF71ABC43); // Couleur par défaut (DISPONIBLE) si l'état est inconnu
   }
+}
+
+void Toast(String msg){
+  Fluttertoast.showToast(
+      msg: msg,
+      //toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0
+  );
 }

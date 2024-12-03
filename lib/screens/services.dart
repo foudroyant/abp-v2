@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../components/item_team.dart';
-import '../components/ui_element.dart';
 import '../models/option.dart';
+import '../models/services.dart';
 import '../utils/data.dart';
 
 class Services extends StatefulWidget {
@@ -16,9 +16,15 @@ class Services extends StatefulWidget {
 class _ServicesState extends State<Services> {
   String categorie = "Tout le monde";
   List<String> categories = ["Femme", "Homme", "Fille", "Garçon", "Tout le monde"];
-  List<Prestation> les_prestations = prestations;
+  late List<Prestation> les_prestations;
   String categorie_new_option = "Tout le monde";
   List<Option> les_options = options;
+
+  List<Prestation> _getByGenre(String genre){
+    return context.read<Services_Model>().prestations.where((p){
+      return p.categorie.toLowerCase().contains(genre.toLowerCase());
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,18 +89,19 @@ class _ServicesState extends State<Services> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ListView(
+                  /*ListView(
                     children : [
                       _prestations(),
                       Padding(
                         padding: const EdgeInsets.only(left : 8.0, right : 8),
                         child: Column(
-                          children : les_prestations.map((p){
+                          //context.read<Options>().options.
+                          children : context.read<Services_Model>().prestations.map((p){
                             return InkWell(
                               onTap : (){
-                                showBottomSheet(context: context, builder: (BuildContext context) {
+                                /*showBottomSheet(context: context, builder: (BuildContext context) {
                                   return _update_service(p); //_bottomSheet(false);
-                                });
+                                });*/
                               },
                               child: _service(
                                   context, p),
@@ -103,16 +110,61 @@ class _ServicesState extends State<Services> {
                         ),
                       )
                     ]
-                  ),
-                  const Center(),
-                  const Center(),
-                  const Center(),
-                  const Center(),
+                  ),*/
+                  la_liste(_getByGenre("Femme")),
+                  la_liste(_getByGenre("Homme")),
+                  la_liste(_getByGenre("Fille")),
+                  la_liste(_getByGenre("Garçon")),
+                  la_liste(_getByGenre("Tout le monde")),
                 ],
               ),
             ),
           ]
       ),
+    );
+  }
+
+  Widget la_liste(List<Prestation> prestations){
+    List<String> _types = prestations.map((p){
+      return p.type;
+    }).toList().toSet().toList();
+
+    setState((){
+      les_prestations = prestations;
+    });
+    return ListView(
+        children : [
+          Padding(
+            padding: const EdgeInsets.only(top : 8),
+            child: Container(
+              height : 80,
+              child : ListView.builder(itemBuilder: (BuildContext context,  int index) {
+                return InkWell(
+                  onTap : (){
+                  },
+                    child: _prestation("assets/images/team.png", _types[index])
+                );
+              }, scrollDirection : Axis.horizontal, itemCount : _types.length)
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left : 8.0, right : 8),
+            child: Column(
+              //context.read<Options>().options.
+              children : les_prestations.map((p){
+                return InkWell(
+                  onTap : (){
+                    /*showBottomSheet(context: context, builder: (BuildContext context) {
+                                  return _update_service(p); //_bottomSheet(false);
+                                });*/
+                  },
+                  child: _service(
+                      context, p),
+                );
+              }).toList(),
+            ),
+          )
+        ]
     );
   }
 
@@ -163,7 +215,7 @@ class _ServicesState extends State<Services> {
 
   Widget _service(BuildContext context, Prestation la_prestation){
     // Recherche de l'index dans la liste
-    int index = les_prestations.indexWhere((_p) => _p.nom == la_prestation.nom);
+    int index = context.read<Services_Model>().prestations.indexWhere((_p) => _p.nom == la_prestation.nom);
    // context.watch<Options>().
 
     //context.read<Options>().set_options(les_options);
@@ -199,13 +251,20 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                   SizedBox(width : 5),
-                  Container(
-                    width: 21,
-                    height: 23,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/mage_edit.png"),
-                        fit: BoxFit.contain,
+                  InkWell(
+                    onTap:(){
+                      showBottomSheet(context: context, builder: (BuildContext context) {
+                        return _update_service(la_prestation);
+                      });
+                    },
+                    child: Container(
+                      width: 21,
+                      height: 23,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/mage_edit.png"),
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
@@ -261,7 +320,7 @@ class _ServicesState extends State<Services> {
                 onChanged: (value) {
                   print(value) ; // Exécuter la fonction passée en paramètre
                   setState((){
-                    les_prestations[index].setEtat(value);
+                    context.read<Services_Model>().prestations[index].setEtat(value);
                   });
                 },
                 activeTrackColor: Color(0xFFE6E0E9),
@@ -337,6 +396,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  //Nouveau service
   Widget _nvle_prestation(){
     return Container(
         width : double.infinity,
@@ -591,7 +651,7 @@ class _ServicesState extends State<Services> {
 
   Widget _update_service(Prestation la_prestation){
     // Recherche de l'index dans la liste
-    int index = les_prestations.indexWhere((_p) => _p.nom == la_prestation.nom);
+    int index = context.read<Services_Model>().prestations.indexWhere((_p) => _p.nom == la_prestation.nom);
 
 
     final TextEditingController _ctrl_nom = TextEditingController(); _ctrl_nom.text = la_prestation.nom;
@@ -667,7 +727,7 @@ class _ServicesState extends State<Services> {
             SizedBox(height : 5),
             DropdownButton<String>(
               hint: Text('Sélectionner une option'), // Texte de l'indication
-              value: les_prestations[index].categorie, // La valeur sélectionnée actuelle
+              value: context.read<Services_Model>().prestations[index].categorie, // La valeur sélectionnée actuelle
               icon: Icon(Icons.arrow_drop_down), // Icône du menu déroulant
               items: categories.map((String option) {
                 return DropdownMenuItem<String>(
@@ -676,9 +736,7 @@ class _ServicesState extends State<Services> {
                 );
               }).toList(),
               onChanged: (String? newValue) {
-                setState(() {
-                  les_prestations[index].categorie = newValue!; // Mise à jour de la valeur sélectionnée
-                });
+                context.read<Services_Model>().prestations[index].categorie = newValue!;
                 print(la_prestation.categorie);
               },
             ),
@@ -761,10 +819,10 @@ class _ServicesState extends State<Services> {
                   ),
                 ),
                 Switch(
-                  value: les_prestations[index].a_domicile,
+                  value: context.read<Services_Model>().prestations[index].a_domicile,
                   onChanged: (_value){
                     setState((){
-                      les_prestations[index].setEtat(_value);
+                      context.read<Services_Model>().prestations[index].setEtat(_value);
                     });
                   },
                   activeTrackColor: Color(0xFF1E5F99),  // Couleur de la piste quand actif
@@ -1231,7 +1289,8 @@ class _ServicesState extends State<Services> {
                     InkWell(
                       onTap : (){
                         showBottomSheet(context: context, builder: (BuildContext context) {
-                          return _nvle_prestation();
+                          //Ajouter des options
+                          return _add_prestation();
                         });
                       },
                       child: Container(

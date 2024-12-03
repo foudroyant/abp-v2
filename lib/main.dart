@@ -1,5 +1,5 @@
 import 'package:abp/screens/agenda.dart';
-import 'package:abp/screens/home.dart';
+import 'package:abp/screens/today.dart';
 import 'package:abp/screens/institut.dart';
 import 'package:abp/screens/parametres.dart';
 import 'package:abp/screens/services.dart';
@@ -7,8 +7,11 @@ import 'package:abp/utils/data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/agenda.dart';
+import 'models/indisponibles.dart';
 import 'models/institut_modele.dart';
 import 'models/option.dart';
+import 'models/services.dart';
 import 'models/utils.dart';
 
 void main() {
@@ -19,6 +22,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  
 
   // This widget is the root of your application.
   @override
@@ -33,6 +37,15 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => Institut_Model(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => Services_Model(prestations: prestations),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AgendaProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => IndisponibleProvider(indisponibles: generateIndisponibles()),
         ),
       ],
       child: MaterialApp(
